@@ -1,13 +1,39 @@
 import './App.css';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import Head from './components/Head';
+import Body from './components/Body';
+import MainContainer from './components/MainContainer'
+import WatchPage from './components/WatchPage'
+import store from './utils/store';
+import { Provider } from 'react-redux';
+
+
+const appRouter = createBrowserRouter([
+  {
+    path: '/',
+    element: <Body />,
+    children: [
+      {
+        path: '/',
+        element: <MainContainer />
+      },
+      {
+        path: '/watch/',
+        element: <WatchPage />
+      },
+    ],
+  },
+])
 
 function App() {
   return (
-    <div className="App">
-      <h1 className="text-3xl font-bold underline">
-        Hello world!
-      </h1>
-    </div>
-  );
+    <Provider store={store}>
+      <div>
+        <Head />
+        <RouterProvider router={appRouter} />
+      </div>
+    </Provider>
+  )
 }
 
 export default App;
