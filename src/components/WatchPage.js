@@ -4,6 +4,7 @@ import { closeMenu } from '../utils/appSlice';
 import { useSearchParams } from 'react-router-dom';
 import { YOUTUBE_BASE_URL } from '../utils/constants';
 import GOOGLE_API_KEY from '../utils/constants';
+import CommentsContainer from './commentsContainer';
 
 const WatchPage = () => {
     const [searchParams] = useSearchParams();
@@ -40,19 +41,24 @@ const WatchPage = () => {
     return (
         <div className='p-4'>
             {videoDetails ? (
-                <div>
-                    <h2 className="text-xl font-bold mb-4">{videoDetails.snippet.title}</h2>
-                    <iframe
-                        width="1200"
-                        height="600"
-                        src={`https://www.youtube.com/embed/${videoId}`}
-                        title="YouTube video player"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        referrerPolicy="strict-origin-when-cross-origin"
-                        allowFullScreen
-                    ></iframe>
-                    <p className="mt-2">{videoDetails.snippet.description}</p>
-                </div>
+                <>
+                    <div>
+                        <h2 className="text-xl font-bold mb-4">{videoDetails.snippet.title}</h2>
+                        <iframe
+                            width="1200"
+                            height="600"
+                            src={`https://www.youtube.com/embed/${videoId}`}
+                            title="YouTube video player"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            referrerPolicy="strict-origin-when-cross-origin"
+                            allowFullScreen
+                        ></iframe>
+                        {/* <p className="mt-2">{videoDetails.snippet.description}</p> */}
+                    </div>
+                    <div className='p-4'>
+                        <CommentsContainer />
+                    </div>
+                </>
             ) : (
                 <p>Loading video...</p>
             )}

@@ -1,14 +1,47 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { toggleMenu } from '../utils/appSlice';
+import { YOUTUBE_SEARCH_URL } from '../utils/constants';
+import { chacheResults } from '../utils/searchSlice';
 
 const Head = () => {
+  const [searchquery, setSearchQuery] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
-    const dispatch = useDispatch();
+  const searchCache = useSelector(store => store.search);
+  const dispatch = useDispatch();
+  
+  useEffect(() => {
+    setTimeout(() => {
+      if(searchCache[searchquery]) {
+        setSuggestions(searchCache[searchquery]);
+        setShowSuggestions(true);
+      } else {
+        getSearchSuggesstions()
+      }
+    }, 200);
 
-    const toggleMenuHandler = () => {
-        dispatch(toggleMenu());
+    return () => {
+      clearTimeout();
     }
+  }, [searchquery]);
+
+
+
+  const getSearchSuggesstions = async () => {
+    const data = await fetch(YOUTUBE_SEARCH_URL + searchquery);
+    const json = await data.json();
+    setSuggestions(json[1]);
+
+    dispatch(chacheResults({
+      [searchquery]: json[1],
+    }));
+  }
+  const toggleMenuHandler = () => {
+      dispatch(toggleMenu());
+  }
 
   return (
     <div className='grid grid-flow-col p-2 m-2 shadow-lg'>
@@ -34,9 +67,19 @@ const Head = () => {
       </div>
 
       <div className='col-span-10 flex pl-16'>
-        <input className='flex justify-center p-2 border border-gray-500 w-1/2 rounded-l-full' type='search' placeholder='Serach' ></input>
+        <input className='flex justify-center p-2 border border-gray-500 w-1/2 rounded-l-full' type='search' placeholder='Serach' value={searchquery} 
+        onChange={(e) => setSearchQuery(e.target.value)}  
+        onFocus={() => setShowSuggestions(true)}
+        onBlur={() => setShowSuggestions(false)}></input>
         <button className='py-2 px-5 border border-gray-500 rounded-r-full' type='submit'> 🔍 </button>
       </div>
+      {showSuggestions && (<div className='fixed bg-white shadow-lg rounded-lg border border-gray-300 mt-10 min-w-[40rem] w-fit left-80 p-2'>
+          <ul>
+            {suggestions.map((s)=> (
+              <li key={s} className='py-2 shadow-sm hover:bg-gray-100 px-1'>🔍 {s}</li>
+            ))}
+          </ul>
+      </div>)}
       <div className='col-span-1'>
         <img className='h-8' src='https://img.favpng.com/0/24/24/user-clip-art-png-favpng-W8qfp3AmEqYe35XjTHNFA5M43_t.jpg' alt='Profile Menu' />
       </div>
